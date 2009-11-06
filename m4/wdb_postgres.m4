@@ -101,19 +101,19 @@ LDFLAGSS="$LDFLAGS $pgsql_LDFLAGS"
 # Check PQ Libraries
 # Search for the libpq Library
 # automatically adds -lpq to the LIBS variable
-AC_SEARCH_LIBS(PQexec, 
-	       	[pq],	 
-	       	[pgsql_LIBS="$pgsql_LIBS -lpq"],
-			[
-		 	AC_MSG_ERROR([
--------------------------------------------------------------------------
-    Unable to link with libpq. If the library is installed, make sure 
-    -L(PGSQL_PATH)/lib is in your LDFLAGS, or specify the path in which 
-    postgres is installed with --with-pgsql=PATH
--------------------------------------------------------------------------
-			])
-			]
-)
+#AC_SEARCH_LIBS(PQexec, 
+#	       	[pq],	 
+#	       	[pgsql_LIBS="$pgsql_LIBS -lpq"],
+#			[
+#		 	AC_MSG_ERROR([
+#-------------------------------------------------------------------------
+#    Unable to link with libpq. If the library is installed, make sure 
+#    -L(PGSQL_PATH)/lib is in your LDFLAGS, or specify the path in which 
+#    postgres is installed with --with-pgsql=PATH
+#-------------------------------------------------------------------------
+#			])
+#			]
+#)
 
 AC_SUBST(pgsql_CFLAGS)
 AC_SUBST(pgsql_LDFLAGS)
@@ -121,7 +121,8 @@ AC_SUBST(pgsql_LIBS)
 
 	# Header files
     #AC_LANG_PUSH(C++)
-	AC_CHECK_HEADER([postgres.h],,
+	AC_CHECK_HEADER([postgres.h],
+					[AC_DEFINE([HAVE_POSTGRES_POSTGRES_H],,[postgres.h is present])],
 					[AC_MSG_ERROR([
 -------------------------------------------------------------------------
     Could not locate postgres.h 
@@ -143,8 +144,12 @@ AC_SUBST(pgsql_LIBS)
     
     CPPFLAGS=$CPPFLAGS
 -------------------------------------------------------------------------
-])
-	])
+])	],
+	[
+#ifdef HAVE_POSTGRES_POSTGRES_H
+#include <postgres.h>
+#endif
+	])	
 	AC_CHECK_HEADER([funcapi.h],,
 					[AC_MSG_ERROR([
 -------------------------------------------------------------------------
@@ -155,8 +160,12 @@ AC_SUBST(pgsql_LIBS)
     
     CPPFLAGS=$CPPFLAGS
 -------------------------------------------------------------------------
-])
-	])
+])	],
+	[
+#ifdef HAVE_POSTGRES_POSTGRES_H
+#include <postgres.h>
+#endif
+	])	
 	AC_CHECK_HEADER([access/htup.h],,
 					[AC_MSG_ERROR([
 -------------------------------------------------------------------------
@@ -167,8 +176,12 @@ AC_SUBST(pgsql_LIBS)
     
     CPPFLAGS=$CPPFLAGS
 -------------------------------------------------------------------------
-])
-	])
+])	],
+	[
+#ifdef HAVE_POSTGRES_POSTGRES_H
+#include <postgres.h>
+#endif
+	])	
 	AC_CHECK_HEADER([utils/array.h],,
 					[AC_MSG_ERROR([
 -------------------------------------------------------------------------
@@ -179,8 +192,12 @@ AC_SUBST(pgsql_LIBS)
     
     CPPFLAGS=$CPPFLAGS
 -------------------------------------------------------------------------
-])
-	])
+])	],
+	[
+#ifdef HAVE_POSTGRES_POSTGRES_H
+#include <postgres.h>
+#endif
+	])	
 	AC_CHECK_HEADER([utils/timestamp.h],,
 					[AC_MSG_ERROR([
 -------------------------------------------------------------------------
@@ -191,8 +208,12 @@ AC_SUBST(pgsql_LIBS)
     
     CPPFLAGS=$CPPFLAGS
 -------------------------------------------------------------------------
-])
-	])
+])	],
+	[
+#ifdef HAVE_POSTGRES_POSTGRES_H
+#include <postgres.h>
+#endif
+	])	
 	AC_CHECK_HEADER([executor/executor.h],,
 					[AC_MSG_ERROR([
 -------------------------------------------------------------------------
@@ -203,8 +224,12 @@ AC_SUBST(pgsql_LIBS)
     
     CPPFLAGS=$CPPFLAGS
 -------------------------------------------------------------------------
-])
-	])
+])	],
+	[
+#ifdef HAVE_POSTGRES_POSTGRES_H
+#include <postgres.h>
+#endif
+	])	
 	AC_CHECK_HEADER([executor/spi.h],,
 					[AC_MSG_ERROR([
 -------------------------------------------------------------------------
@@ -215,8 +240,12 @@ AC_SUBST(pgsql_LIBS)
     
     CPPFLAGS=$CPPFLAGS
 -------------------------------------------------------------------------
-])
-	])
+])	],
+	[
+#ifdef HAVE_POSTGRES_POSTGRES_H
+#include <postgres.h>
+#endif
+	])	
 	#AC_LANG_POP(C++)
 
 ])
@@ -252,33 +281,55 @@ AC_DEFUN([WDB_POSTGIS_CHECK],
 AC_ARG_WITH([postgis],
 	    AS_HELP_STRING([--with-postgis=PATH], 
 	    [Specify the directory in which postgis is installed (default is the PostgreSQL contrib directory)]),
-	    [postgis_SQL="${with_postgis}"],
-	    [postgis_SQL=`${PGCONFIG} --sharedir`]
+	    [postgis_CHECK="${with_postgis}"],
+	    [postgis_CHECK=`${PGCONFIG} --sharedir`]
 )
 
 required_postgis_version=ifelse([$1], [], [1.1.x], [$1])
+postgis_SQL=""
 # no obvious way to check for PostGIS version
 
 AC_MSG_CHECKING(for postgis)
-if test ! -f ${postgis_SQL}/lwpostgis.sql; then
-	postgis_SQL=${postgis_SQL}/../
-	if test ! -f ${postgis_SQL}/lwpostgis.sql; then
-		postgis_SQL=${postgis_SQL}/../postgresql-8.1-postgis
-		if test ! -f ${postgis_SQL}/lwpostgis.sql; then
-			AC_MSG_RESULT(no)
-			AC_MSG_ERROR([
+# Check specified director
+if test -f ${postgis_CHECK}/lwpostgis.sql; then
+	postgis_SQL=${postgis_CHECK}
+fi
+# Usr Share
+if test -z ${postgis_SQL}; then
+	if test -f /usr/share/lwpostgis.sql; then
+		postgis_SQL=/usr/share
+	fi
+fi
+# Debian Directories
+if test -z ${postgis_SQL}; then
+	if test -f /usr/share/postgresql-8.3-postgis/lwpostgis.sql; then
+		postgis_SQL=/usr/share/postgresql-8.3-postgis
+	fi
+fi
+if test -z ${postgis_SQL}; then
+	if test -f /usr/share/postgresql-8.2-postgis/lwpostgis.sql; then
+		postgis_SQL=/usr/share/postgresql-8.2-postgis
+	fi
+fi
+if test -z ${postgis_SQL}; then
+	if test -f /usr/share/postgresql-8.1-postgis/lwpostgis.sql; then
+		postgis_SQL=/usr/share/postgresql-8.1-postgis
+	fi
+fi
+# Error
+if test -z ${postgis_SQL}; then
+	AC_MSG_RESULT(no)
+	AC_MSG_ERROR([
 -------------------------------------------------------------------------
     Cannot find postgis SQL files. Ensure that these files are 
     installed in the share directory of your PostgreSQL installation, 
     or explicitly specify its location using the --with-postgis=PATH 
     option.
 -------------------------------------------------------------------------
-			])
-		fi
-	fi
+	])
 fi
+# Continue
 AC_MSG_RESULT(yes)
-
 AC_SUBST(postgis_SQL)
 
 # Specify default SRID 
