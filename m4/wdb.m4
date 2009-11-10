@@ -34,7 +34,7 @@ AS_IF([test "x$with_wdb" = "xcheck"],
 	  [wdb_conf="$with_wdb/bin/wdb-config"])
 
 if test "x$want_conf" = "xno"; then
-	AC_MSG_INFO("Could not locate WDB configuration binaries. Test programs cannot be run")
+	AC_MSG_WARN("Could not locate WDB configuration binaries. Test programs cannot be run")
 else
 	AC_SUBST([wdb_CONFIG], [`$wdb_conf --bindir`/wdbConfiguration])
 	AC_SUBST([WDB_ADMINISTRATION], [`$wdb_conf --bindir`/wdb])
