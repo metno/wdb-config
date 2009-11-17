@@ -42,7 +42,11 @@ AC_ARG_WITH([gribapi],
 # Add path if given
 if test "$ac_grib_path" != ""; then
     GRIB_CPPFLAGS="-I$ac_grib_path/include"
-	GRIB_LDFLAGS="-L$ac_grib_path/lib"
+
+    # In case someone use lib64 for 64-bit libraries:
+    AC_CHECK_FILE([$ac_grib_path/lib64/libgrib_api.a],
+    [GRIB_LDFLAGS="-L$ac_grib_path/lib64"],
+    [GRIB_LDFLAGS="-L$ac_grib_path/lib"])
 fi
 
 AM_CONDITIONAL(SPECIAL_GRIB_API_PATH, [ test -n $ac_grib_path ]) 
