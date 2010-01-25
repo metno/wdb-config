@@ -61,9 +61,9 @@ AC_DEFUN([WDB_DATABASE_NAME],
 	AC_SUBST( [DATABASE_SCHEMA], [$database_version] )
 	# Define Database Schemas
 	AC_DEFINE_UNQUOTED(WDB_SCHEMA,
-			  		   ["wdb_${database_version}"],
+			  		   ["wdb_int"],
 			  		   [The default schema of WDB])
 	AC_DEFINE_UNQUOTED(WCI_SCHEMA,
-			  		   ["wci_${database_version}"],
+			  		   ["wci_int"],
 			  		   [The default schema of WCI])
 ])
