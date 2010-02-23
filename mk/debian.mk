@@ -20,7 +20,7 @@ prepare-debian:
 	mkdir -p $(DEBIAN_DIR)
 	cp -r $(top_srcdir)/debian_files/* $(DEBIAN_DIR)
 	chmod 774 $(DEBIAN_DIR)/rules
-	debconf-updatepo --podir=$(DEBIAN_DIR)/po
+	if [ -e $(DEBIAN_DIR)/templates ]; then  debconf-updatepo --podir=$(DEBIAN_DIR)/po; fi
 
 update-debian: prepare-debian
 	cd $(PKG_DIR) && dpkg-buildpackage -rfakeroot -us -uc -nc
