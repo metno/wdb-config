@@ -198,6 +198,22 @@ AC_SUBST(pgsql_LIBS)
 #include <postgres.h>
 #endif
 	])	
+	AC_CHECK_HEADER([utils/builtins.h],,
+					[AC_MSG_ERROR([
+-------------------------------------------------------------------------
+    Could not locate utils/builtins.h
+    This indicates that Postgres may not be correctly installed for WDB
+    on your site. WDB requires the development files for server-side
+    programming of PostgreSQL to be installed.
+    
+    CPPFLAGS=$CPPFLAGS
+-------------------------------------------------------------------------
+])	],
+	[
+#ifdef HAVE_POSTGRES_POSTGRES_H
+#include <postgres.h>
+#endif
+	])	
 	AC_CHECK_HEADER([utils/timestamp.h],,
 					[AC_MSG_ERROR([
 -------------------------------------------------------------------------
@@ -290,9 +306,25 @@ postgis_SQL=""
 # no obvious way to check for PostGIS version
 
 AC_MSG_CHECKING(for postgis)
-# Check specified director
+# Check specified directory for postgis (1.4+) or lwpostgis (-1.3)
 if test -f ${postgis_CHECK}/lwpostgis.sql; then
 	postgis_SQL=${postgis_CHECK}
+fi
+if test -z ${postgis_SQL}; then
+	if test -f ${postgis_CHECK}/postgis.sql; then
+		postgis_SQL=${postgis_CHECK}
+	fi
+fi
+# Contrib directory is an alternative location
+if test -z ${postgis_SQL}; then
+	if test -f ${postgis_CHECK}/contrib/lwpostgis.sql; then
+		postgis_SQL=${postgis_CHECK}
+	fi
+fi
+if test -z ${postgis_SQL}; then
+	if test -f ${postgis_CHECK}/contrib/postgis.sql; then
+		postgis_SQL=${postgis_CHECK}
+	fi
 fi
 # Usr Share
 if test -z ${postgis_SQL}; then
@@ -300,7 +332,17 @@ if test -z ${postgis_SQL}; then
 		postgis_SQL=/usr/share
 	fi
 fi
+if test -z ${postgis_SQL}; then
+	if test -f /usr/share/postgis.sql; then
+		postgis_SQL=/usr/share
+	fi
+fi
 # Debian Directories
+if test -z ${postgis_SQL}; then
+	if test -f /usr/share/postgresql-8.4-postgis/postgis.sql; then
+		postgis_SQL=/usr/share/postgresql-8.4-postgis
+	fi
+fi
 if test -z ${postgis_SQL}; then
 	if test -f /usr/share/postgresql-8.3-postgis/lwpostgis.sql; then
 		postgis_SQL=/usr/share/postgresql-8.3-postgis
