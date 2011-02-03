@@ -28,7 +28,7 @@ update-debian: prepare-debian
 	lintian $(DEBIAN_PACKAGE_NAME) $(DEBIAN_SOURCE_PACKAGE_NAME)
 
 build-debian:
-	cd $(PKG_DIR) && dpkg-buildpackage -rfakeroot -us -uc -sa
+	cd $(PKG_DIR) && dpkg-buildpackage -rfakeroot -us -uc -sa -i.svn
 	lintian $(DEBIAN_PACKAGE_NAME) $(DEBIAN_SOURCE_PACKAGE_NAME)
 
 debian: dist-debian prepare-debian build-debian
