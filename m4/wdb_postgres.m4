@@ -317,13 +317,18 @@ if test -z ${postgis_SQL}; then
 fi
 # Contrib directory is an alternative location
 if test -z ${postgis_SQL}; then
+	if test -f ${postgis_CHECK}/contrib/postgis-1.5/postgis.sql; then
+		postgis_SQL=${postgis_CHECK}/contrib/postgis-1.5
+	fi
+fi
+if test -z ${postgis_SQL}; then
 	if test -f ${postgis_CHECK}/contrib/lwpostgis.sql; then
-		postgis_SQL=${postgis_CHECK}
+		postgis_SQL=${postgis_CHECK}/contrib
 	fi
 fi
 if test -z ${postgis_SQL}; then
 	if test -f ${postgis_CHECK}/contrib/postgis.sql; then
-		postgis_SQL=${postgis_CHECK}
+		postgis_SQL=${postgis_CHECK}/contrib
 	fi
 fi
 # Usr Share
