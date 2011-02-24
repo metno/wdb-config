@@ -6,7 +6,6 @@
 PKG_DIR = $(PACKAGE)-$(VERSION)
 DEBIAN_DIR = $(PKG_DIR)/debian
 DEBIAN_PACKAGE = `head -n1 $(top_srcdir)/debian_files/changelog | sed "s/ (/_/" | sed "s/_.*//"`_$(VERSION)
-#DEBIAN_PACKAGE = $(PACKAGE)_$(VERSION)
 ARCH = `dpkg-architecture -qDEB_HOST_ARCH_CPU`
 DEBIAN_PACKAGE_NAME_BASE = `head -n1 $(top_srcdir)/debian_files/changelog | sed "s/ (/_/" | sed "s/).*//"`
 DEBIAN_PACKAGE_NAME = $(DEBIAN_PACKAGE_NAME_BASE)_$(ARCH).deb
@@ -31,7 +30,7 @@ build-debian:
 	cd $(PKG_DIR) && dpkg-buildpackage -rfakeroot -us -uc -sa -i.svn
 	lintian $(DEBIAN_PACKAGE_NAME) $(DEBIAN_SOURCE_PACKAGE_NAME)
 
-debian: dist-debian prepare-debian build-debian
+common-debian: dist-debian prepare-debian build-debian
 
 clean-debian:
 	debclean
