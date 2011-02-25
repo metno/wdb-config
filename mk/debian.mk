@@ -1,13 +1,13 @@
 
 #-----------------------------------------------------------------------------
-# Debian stuff
+# Common Debian Package
 #-----------------------------------------------------------------------------
 
 PKG_DIR = $(PACKAGE)-$(VERSION)
 DEBIAN_DIR = $(PKG_DIR)/debian
-DEBIAN_PACKAGE = `head -n1 $(top_srcdir)/debian_files/changelog | sed "s/ (/_/" | sed "s/_.*//"`_$(VERSION)
+DEBIAN_PACKAGE = `head -n1 $(top_srcdir)/ChangeLog | sed "s/ (/_/" | sed "s/_.*//"`_$(VERSION)
 ARCH = `dpkg-architecture -qDEB_HOST_ARCH_CPU`
-DEBIAN_PACKAGE_NAME_BASE = `head -n1 $(top_srcdir)/debian_files/changelog | sed "s/ (/_/" | sed "s/).*//"`
+DEBIAN_PACKAGE_NAME_BASE = `head -n1 $(top_srcdir)/ChangeLog | sed "s/ (/_/" | sed "s/).*//"`
 DEBIAN_PACKAGE_NAME = $(DEBIAN_PACKAGE_NAME_BASE)_$(ARCH).deb
 DEBIAN_SOURCE_PACKAGE_NAME = $(DEBIAN_PACKAGE_NAME_BASE).dsc
 
@@ -19,6 +19,7 @@ prepare-debian:
 	rm -rf $(DEBIAN_DIR)
 	mkdir -p $(DEBIAN_DIR)
 	cp -r $(top_srcdir)/debian_files/* $(DEBIAN_DIR)
+	cp $(top_srcdir)/ChangeLog $(DEBIAN_DIR)/changelog
 	chmod 774 $(DEBIAN_DIR)/rules
 	if [ -e $(DEBIAN_DIR)/templates ]; then  debconf-updatepo --podir=$(DEBIAN_DIR)/po; fi
 
