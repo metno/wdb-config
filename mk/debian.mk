@@ -5,10 +5,11 @@
 
 PKG_DIR = $(PACKAGE)-$(VERSION)
 DEBIAN_DIR = $(PKG_DIR)/debian
-DEBIAN_PACKAGE = `head -n1 $(top_srcdir)/ChangeLog | sed "s/ (/_/" | sed "s/).*//"`
+DEBIAN_PACKAGE = `head -n1 $(top_srcdir)/ChangeLog | sed "s/ (/_/" | sed "s/\(.*\)-.*/\1/"`
 ARCH = `dpkg-architecture -qDEB_HOST_ARCH_CPU`
-DEBIAN_PACKAGE_NAME = $(DEBIAN_PACKAGE)_$(ARCH).deb
-DEBIAN_SOURCE_PACKAGE_NAME = $(DEBIAN_PACKAGE).dsc
+DEBIAN_PACKAGE_NAME_BASE = `head -n1 $(top_srcdir)/ChangeLog | sed "s/ (/_/" | sed "s/).*//"`
+DEBIAN_PACKAGE_NAME = $(DEBIAN_PACKAGE_NAME_BASE)_$(ARCH).deb
+DEBIAN_SOURCE_PACKAGE_NAME = $(DEBIAN_PACKAGE_NAME_BASE).dsc
 
 dist-debian: dist clean-debian
 	tar xvzf $(PKG_DIR).tar.gz
