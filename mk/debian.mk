@@ -35,4 +35,4 @@ common-debian: dist-debian prepare-debian build-debian
 
 clean-debian:
 	debclean
-	rm -rf $(PKG_DIR) $(DEBIAN_PACKAGE_NAME_BASE)*
+	rm -rf $(PKG_DIR) $(DEBIAN_PACKAGE)*
